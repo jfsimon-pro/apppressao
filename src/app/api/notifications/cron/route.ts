@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
   `;
 
   if (dueReminders.length === 0) {
-    return NextResponse.json({ sent: 0, message: 'No reminders due' });
+    return NextResponse.json({ sent: 0, serverTime: now, message: 'No reminders due at this time' });
   }
 
   // Get subscriptions for all affected users
@@ -94,5 +94,11 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ sent, failed: failed.length });
+  return NextResponse.json({
+    sent,
+    failed: failed.length,
+    serverTime: now,
+    remindersFound: dueReminders.length,
+    subscriptionsFound: subscriptions.length,
+  });
 }
