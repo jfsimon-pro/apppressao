@@ -4,6 +4,7 @@ import styles from './dashboard.module.css';
 import { Sun, Moon, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/lib/LanguageContext';
+import type { Translations } from '@/lib/i18n';
 
 interface Reading {
     id: number;
@@ -29,6 +30,89 @@ function buildMeasuredAt(time: string): string | undefined {
     const d = new Date();
     d.setHours(Number(h), Number(m), 0, 0);
     return d.toISOString();
+}
+
+// BpCard fora do DashboardPage — evita perda de foco ao digitar
+function BpCard({
+    period,
+    icon,
+    label,
+    card,
+    setCard,
+    customBg,
+    saving,
+    saved,
+    onSave,
+    t,
+}: {
+    period: string;
+    icon: React.ReactNode;
+    label: string;
+    card: CardState;
+    setCard: React.Dispatch<React.SetStateAction<CardState>>;
+    customBg?: boolean;
+    saving: boolean;
+    saved: boolean;
+    onSave: () => void;
+    t: Translations['dashboard'];
+}) {
+    return (
+        <div className={customBg ? styles.cardCustom : styles.card}>
+            <div className={styles.cardHeader}>
+                <span className={styles.cardIcon}>{icon}</span>
+                <h3>{label}</h3>
+            </div>
+            <div className={styles.inputs}>
+                <div className={styles.inputField}>
+                    <label>{t.time}</label>
+                    <input
+                        type="time"
+                        value={card.time}
+                        onChange={(e) => setCard((p) => ({ ...p, time: e.target.value }))}
+                        className={styles.timeInput}
+                    />
+                </div>
+                <div className={styles.inputField}>
+                    <label>{t.systolic}</label>
+                    <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        placeholder="120"
+                        value={card.sys}
+                        onChange={(e) => setCard((p) => ({ ...p, sys: e.target.value }))}
+                    />
+                </div>
+                <div className={styles.inputField}>
+                    <label>{t.diastolic}</label>
+                    <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        placeholder="80"
+                        value={card.dia}
+                        onChange={(e) => setCard((p) => ({ ...p, dia: e.target.value }))}
+                    />
+                </div>
+            </div>
+            <div className={styles.obsField}>
+                <label>{t.observation}</label>
+                <textarea
+                    placeholder={t.obPlaceholder}
+                    value={card.obs}
+                    onChange={(e) => setCard((p) => ({ ...p, obs: e.target.value }))}
+                    rows={2}
+                />
+            </div>
+            <button
+                className={styles.saveButton}
+                disabled={saving}
+                onClick={onSave}
+            >
+                {saved ? t.saved : saving ? t.saving : t.save}
+            </button>
+        </div>
+    );
 }
 
 export default function DashboardPage() {
@@ -113,76 +197,6 @@ export default function DashboardPage() {
 
     const firstName = userName.split(' ')[0];
 
-    function BpCard({
-        period,
-        icon,
-        label,
-        card,
-        setCard,
-        customBg,
-    }: {
-        period: string;
-        icon: React.ReactNode;
-        label: string;
-        card: CardState;
-        setCard: React.Dispatch<React.SetStateAction<CardState>>;
-        customBg?: boolean;
-    }) {
-        return (
-            <div className={customBg ? styles.cardCustom : styles.card}>
-                <div className={styles.cardHeader}>
-                    <span className={styles.cardIcon}>{icon}</span>
-                    <h3>{label}</h3>
-                </div>
-                <div className={styles.inputs}>
-                    <div className={styles.inputField}>
-                        <label>{t.dashboard.time}</label>
-                        <input
-                            type="time"
-                            value={card.time}
-                            onChange={(e) => setCard((p) => ({ ...p, time: e.target.value }))}
-                            className={styles.timeInput}
-                        />
-                    </div>
-                    <div className={styles.inputField}>
-                        <label>{t.dashboard.systolic}</label>
-                        <input
-                            type="number"
-                            placeholder="120"
-                            value={card.sys}
-                            onChange={(e) => setCard((p) => ({ ...p, sys: e.target.value }))}
-                        />
-                    </div>
-                    <div className={styles.inputField}>
-                        <label>{t.dashboard.diastolic}</label>
-                        <input
-                            type="number"
-                            placeholder="80"
-                            value={card.dia}
-                            onChange={(e) => setCard((p) => ({ ...p, dia: e.target.value }))}
-                        />
-                    </div>
-                </div>
-                <div className={styles.obsField}>
-                    <label>{t.dashboard.observation}</label>
-                    <textarea
-                        placeholder={t.dashboard.obPlaceholder}
-                        value={card.obs}
-                        onChange={(e) => setCard((p) => ({ ...p, obs: e.target.value }))}
-                        rows={2}
-                    />
-                </div>
-                <button
-                    className={styles.saveButton}
-                    disabled={saving[period]}
-                    onClick={() => saveReading(period, card)}
-                >
-                    {saved[period] ? t.dashboard.saved : saving[period] ? t.dashboard.saving : t.dashboard.save}
-                </button>
-            </div>
-        );
-    }
-
     return (
         <div className={styles.container}>
             <header className={styles.header}>
@@ -207,6 +221,10 @@ export default function DashboardPage() {
                             label={t.dashboard.morning}
                             card={morning}
                             setCard={setMorning}
+                            saving={saving['morning'] ?? false}
+                            saved={saved['morning'] ?? false}
+                            onSave={() => saveReading('morning', morning)}
+                            t={t.dashboard}
                         />
                         <BpCard
                             period="night"
@@ -214,6 +232,10 @@ export default function DashboardPage() {
                             label={t.dashboard.night}
                             card={night}
                             setCard={setNight}
+                            saving={saving['night'] ?? false}
+                            saved={saved['night'] ?? false}
+                            onSave={() => saveReading('night', night)}
+                            t={t.dashboard}
                         />
                         <BpCard
                             period="extra"
@@ -222,6 +244,10 @@ export default function DashboardPage() {
                             card={extra}
                             setCard={setExtra}
                             customBg
+                            saving={saving['extra'] ?? false}
+                            saved={saved['extra'] ?? false}
+                            onSave={() => saveReading('extra', extra)}
+                            t={t.dashboard}
                         />
                     </div>
                 </section>
