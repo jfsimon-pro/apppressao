@@ -3,8 +3,17 @@
 import styles from './settings.module.css';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/lib/LanguageContext';
+import type { Locale } from '@/lib/i18n';
+
+const LANGUAGES: { code: Locale; flag: string; label: string }[] = [
+    { code: 'pt', flag: '🇧🇷', label: 'Português' },
+    { code: 'en', flag: '🇺🇸', label: 'English' },
+    { code: 'es', flag: '🇪🇸', label: 'Español' },
+];
 
 export default function SettingsPage() {
+    const { t, locale, setLocale } = useLanguage();
     const router = useRouter();
     const [pushEnabled, setPushEnabled] = useState(true);
 
@@ -39,12 +48,12 @@ export default function SettingsPage() {
             });
             const data = await res.json();
             if (res.ok) {
-                setMessage({ type: 'success', text: 'Dados atualizados com sucesso!' });
+                setMessage({ type: 'success', text: t.settings.saveSuccess });
             } else {
-                setMessage({ type: 'error', text: data.error ?? 'Erro ao salvar dados.' });
+                setMessage({ type: 'error', text: data.error ?? t.settings.saveError });
             }
         } catch {
-            setMessage({ type: 'error', text: 'Erro de conexão.' });
+            setMessage({ type: 'error', text: t.settings.connectionError });
         } finally {
             setSaving(false);
         }
@@ -58,21 +67,21 @@ export default function SettingsPage() {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <h1>Configurações</h1>
-                <p>Gerencie sua conta e preferências</p>
+                <h1>{t.settings.title}</h1>
+                <p>{t.settings.subtitle}</p>
             </header>
 
             <main className={styles.main}>
                 {/* Personal Data Section */}
                 <section className={styles.section}>
-                    <h2>Dados Pessoais</h2>
+                    <h2>{t.settings.personalData}</h2>
                     <div className={styles.card}>
                         {loading ? (
-                            <p style={{ color: 'var(--muted)' }}>Carregando...</p>
+                            <p style={{ color: 'var(--muted)' }}>{t.settings.loading}</p>
                         ) : (
                             <>
                                 <div className={styles.inputGroup}>
-                                    <label>Nome Completo</label>
+                                    <label>{t.settings.fullName}</label>
                                     <input
                                         type="text"
                                         value={name}
@@ -80,7 +89,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className={styles.inputGroup}>
-                                    <label>E-mail</label>
+                                    <label>{t.settings.email}</label>
                                     <input
                                         type="email"
                                         value={email}
@@ -88,12 +97,12 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className={styles.inputGroup}>
-                                    <label>Telefone</label>
+                                    <label>{t.settings.phone}</label>
                                     <input
                                         type="tel"
                                         value={phone}
                                         onChange={(e) => setPhone(e.target.value)}
-                                        placeholder="+55 11 99999-9999"
+                                        placeholder={t.settings.phonePlaceholder}
                                     />
                                 </div>
                                 {message && (
@@ -106,21 +115,21 @@ export default function SettingsPage() {
                                     onClick={handleSave}
                                     disabled={saving}
                                 >
-                                    {saving ? 'Salvando...' : 'Atualizar Dados'}
+                                    {saving ? t.settings.saving : t.settings.saveButton}
                                 </button>
                             </>
                         )}
                     </div>
                 </section>
 
-                {/* Notifications Section */}
+                {/* Preferences Section */}
                 <section className={styles.section}>
-                    <h2>Preferências</h2>
+                    <h2>{t.settings.preferences}</h2>
                     <div className={styles.card}>
                         <div className={styles.settingItem}>
                             <div className={styles.settingInfo}>
-                                <strong>Notificações Push</strong>
-                                <p>Receba alertas de medição e saúde</p>
+                                <strong>{t.settings.pushNotif}</strong>
+                                <p>{t.settings.pushNotifDesc}</p>
                             </div>
                             <label className={styles.switch}>
                                 <input
@@ -131,11 +140,29 @@ export default function SettingsPage() {
                                 <span className={styles.slider}></span>
                             </label>
                         </div>
+
+                        <div className={styles.settingItem} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '0.75rem' }}>
+                            <div className={styles.settingInfo}>
+                                <strong>{t.settings.language}</strong>
+                                <p>{t.settings.languageLabel}</p>
+                            </div>
+                            <div className={styles.languageSelector}>
+                                {LANGUAGES.map((lang) => (
+                                    <button
+                                        key={lang.code}
+                                        className={`${styles.langBtn} ${locale === lang.code ? styles.langBtnActive : ''}`}
+                                        onClick={() => setLocale(lang.code)}
+                                    >
+                                        {lang.flag} {lang.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </section>
 
                 <button className={styles.logoutButton} onClick={handleLogout}>
-                    Sair da Conta
+                    {t.settings.logout}
                 </button>
             </main>
             <div className={styles.spacer} />

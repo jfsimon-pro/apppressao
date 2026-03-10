@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { Activity } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -49,52 +51,52 @@ export default function RegisterPage() {
           <div className={styles.logo}>
             <Activity size={48} color="var(--primary)" />
           </div>
-          <h1>Criar conta</h1>
-          <p>Comece a monitorar sua pressão arterial</p>
+          <h1>{t.register.title}</h1>
+          <p>{t.register.subtitle}</p>
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
           {error && <div className={styles.error}>{error}</div>}
 
           <div className={styles.inputGroup}>
-            <label htmlFor="name">Nome</label>
+            <label htmlFor="name">{t.register.name}</label>
             <input
               type="text"
               id="name"
-              placeholder="Seu nome"
+              placeholder={t.register.namePlaceholder}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
           </div>
           <div className={styles.inputGroup}>
-            <label htmlFor="email">E-mail</label>
+            <label htmlFor="email">{t.register.email}</label>
             <input
               type="email"
               id="email"
-              placeholder="seu@email.com"
+              placeholder={t.register.emailPlaceholder}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
           <div className={styles.inputGroup}>
-            <label htmlFor="password">Senha</label>
+            <label htmlFor="password">{t.register.password}</label>
             <input
               type="password"
               id="password"
-              placeholder="Mínimo 6 caracteres"
+              placeholder={t.register.passwordPlaceholder}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
           <div className={styles.inputGroup}>
-            <label htmlFor="confirm">Confirmar senha</label>
+            <label htmlFor="confirm">{t.register.password}</label>
             <input
               type="password"
               id="confirm"
-              placeholder="••••••••"
+              placeholder={t.register.passwordPlaceholder}
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               required
@@ -102,12 +104,12 @@ export default function RegisterPage() {
           </div>
 
           <button type="submit" className={styles.submitButton} disabled={loading}>
-            {loading ? 'Criando conta...' : 'Criar conta'}
+            {loading ? t.register.registering : t.register.registerButton}
           </button>
         </form>
 
         <div className={styles.footer}>
-          <p>Já tem uma conta? <Link href="/login">Entrar</Link></p>
+          <p>{t.register.hasAccount} <Link href="/login">{t.register.loginLink}</Link></p>
         </div>
       </div>
     </div>

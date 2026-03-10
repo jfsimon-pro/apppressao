@@ -3,6 +3,7 @@
 import styles from './dashboard.module.css';
 import { Sun, Moon, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 interface Reading {
     id: number;
@@ -20,31 +21,7 @@ interface CardState {
     obs: string;
 }
 
-function getBpStatus(systolic: number, diastolic: number): { label: string; className: string } {
-    if (systolic < 90 || diastolic < 60) return { label: 'Baixa', className: styles.statusBaixa };
-    if (systolic > 180 || diastolic > 120) return { label: 'Crise', className: styles.statusCrise };
-    if (systolic >= 140 || diastolic >= 90) return { label: 'Alta', className: styles.statusAlta };
-    if (systolic >= 130 || diastolic >= 80) return { label: 'Elevada', className: styles.statusElevada };
-    return { label: 'Normal', className: styles.statusNormal };
-}
-
-function periodLabel(period: string): string {
-    if (period === 'morning') return 'Manhã';
-    if (period === 'night') return 'Noite';
-    return 'Extra';
-}
-
-function formatDate(iso: string): string {
-    return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
-}
-
-function formatTime(iso: string): string {
-    return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-}
-
-function todayFormatted(): string {
-    return new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
-}
+const emptyCard = (): CardState => ({ sys: '', dia: '', time: '', obs: '' });
 
 function buildMeasuredAt(time: string): string | undefined {
     if (!time) return undefined;
@@ -54,9 +31,8 @@ function buildMeasuredAt(time: string): string | undefined {
     return d.toISOString();
 }
 
-const emptyCard = (): CardState => ({ sys: '', dia: '', time: '', obs: '' });
-
 export default function DashboardPage() {
+    const { t } = useLanguage();
     const [userName, setUserName] = useState('');
     const [initials, setInitials] = useState('');
     const [readings, setReadings] = useState<Reading[]>([]);
@@ -109,6 +85,32 @@ export default function DashboardPage() {
         loadReadings();
     }
 
+    function getBpStatus(systolic: number, diastolic: number): { label: string; className: string } {
+        if (systolic < 90 || diastolic < 60) return { label: t.bpStatus.low, className: styles.statusBaixa };
+        if (systolic > 180 || diastolic > 120) return { label: t.bpStatus.crisis, className: styles.statusCrise };
+        if (systolic >= 140 || diastolic >= 90) return { label: t.bpStatus.high, className: styles.statusAlta };
+        if (systolic >= 130 || diastolic >= 80) return { label: t.bpStatus.elevated, className: styles.statusElevada };
+        return { label: t.bpStatus.normal, className: styles.statusNormal };
+    }
+
+    function periodLabel(period: string): string {
+        if (period === 'morning') return t.period.morning;
+        if (period === 'night') return t.period.night;
+        return t.period.extra;
+    }
+
+    function formatDate(iso: string): string {
+        return new Date(iso).toLocaleDateString(t.locale, { day: '2-digit', month: 'short' });
+    }
+
+    function formatTime(iso: string): string {
+        return new Date(iso).toLocaleTimeString(t.locale, { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function todayFormatted(): string {
+        return new Date().toLocaleDateString(t.locale, { day: '2-digit', month: 'long' });
+    }
+
     const firstName = userName.split(' ')[0];
 
     function BpCard({
@@ -134,7 +136,7 @@ export default function DashboardPage() {
                 </div>
                 <div className={styles.inputs}>
                     <div className={styles.inputField}>
-                        <label>Hora</label>
+                        <label>{t.dashboard.time}</label>
                         <input
                             type="time"
                             value={card.time}
@@ -143,7 +145,7 @@ export default function DashboardPage() {
                         />
                     </div>
                     <div className={styles.inputField}>
-                        <label>Sist.</label>
+                        <label>{t.dashboard.systolic}</label>
                         <input
                             type="number"
                             placeholder="120"
@@ -152,7 +154,7 @@ export default function DashboardPage() {
                         />
                     </div>
                     <div className={styles.inputField}>
-                        <label>Diast.</label>
+                        <label>{t.dashboard.diastolic}</label>
                         <input
                             type="number"
                             placeholder="80"
@@ -162,9 +164,9 @@ export default function DashboardPage() {
                     </div>
                 </div>
                 <div className={styles.obsField}>
-                    <label>Observação</label>
+                    <label>{t.dashboard.observation}</label>
                     <textarea
-                        placeholder="Como você está se sentindo? (opcional)"
+                        placeholder={t.dashboard.obPlaceholder}
                         value={card.obs}
                         onChange={(e) => setCard((p) => ({ ...p, obs: e.target.value }))}
                         rows={2}
@@ -175,7 +177,7 @@ export default function DashboardPage() {
                     disabled={saving[period]}
                     onClick={() => saveReading(period, card)}
                 >
-                    {saved[period] ? 'Salvo ✓' : saving[period] ? 'Salvando...' : 'Salvar'}
+                    {saved[period] ? t.dashboard.saved : saving[period] ? t.dashboard.saving : t.dashboard.save}
                 </button>
             </div>
         );
@@ -185,8 +187,8 @@ export default function DashboardPage() {
         <div className={styles.container}>
             <header className={styles.header}>
                 <div className={styles.welcome}>
-                    <p>Olá, {firstName || '...'}</p>
-                    <h1>Painel de Saúde</h1>
+                    <p>{t.dashboard.greeting} {firstName || '...'}</p>
+                    <h1>{t.dashboard.title}</h1>
                 </div>
                 <div className={styles.avatar}>{initials || '...'}</div>
             </header>
@@ -194,29 +196,29 @@ export default function DashboardPage() {
             <main className={styles.main}>
                 <section className={styles.registration}>
                     <div className={styles.sectionHeader}>
-                        <h2>Registrar Pressão</h2>
-                        <span className={styles.date}>Hoje, {todayFormatted()}</span>
+                        <h2>{t.dashboard.registerPressure}</h2>
+                        <span className={styles.date}>{t.dashboard.today} {todayFormatted()}</span>
                     </div>
 
                     <div className={styles.grid}>
                         <BpCard
                             period="morning"
                             icon={<Sun size={20} color="var(--primary)" />}
-                            label="Manhã"
+                            label={t.dashboard.morning}
                             card={morning}
                             setCard={setMorning}
                         />
                         <BpCard
                             period="night"
                             icon={<Moon size={20} color="var(--primary)" />}
-                            label="Noite"
+                            label={t.dashboard.night}
                             card={night}
                             setCard={setNight}
                         />
                         <BpCard
                             period="extra"
                             icon={<Plus size={20} color="var(--primary)" />}
-                            label="Extra"
+                            label={t.dashboard.extra}
                             card={extra}
                             setCard={setExtra}
                             customBg
@@ -226,13 +228,13 @@ export default function DashboardPage() {
 
                 <section className={styles.history}>
                     <div className={styles.sectionHeader}>
-                        <h2>Últimos Registros</h2>
-                        <a href="/history" className={styles.seeAll}>Ver todos</a>
+                        <h2>{t.dashboard.lastRecords}</h2>
+                        <a href="/history" className={styles.seeAll}>{t.dashboard.seeAll}</a>
                     </div>
 
                     <div className={styles.historyList}>
                         {readings.length === 0 && (
-                            <p style={{ color: 'var(--muted)', fontSize: '0.875rem' }}>Nenhum registro ainda.</p>
+                            <p style={{ color: 'var(--muted)', fontSize: '0.875rem' }}>{t.dashboard.noRecords}</p>
                         )}
                         {readings.map((r) => {
                             const status = getBpStatus(r.systolic, r.diastolic);

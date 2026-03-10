@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
+import { LanguageProvider } from "@/lib/LanguageContext";
 
 export const metadata: Metadata = {
   title: "myBPBuddy - Controle de Pressão",
@@ -51,9 +52,11 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
       </head>
       <body>
-        <ServiceWorkerRegistrar />
-        {children}
-        <BottomNav />
+        <LanguageProvider>
+          <ServiceWorkerRegistrar />
+          {children}
+          <BottomNav />
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -6,9 +6,11 @@ import { Activity } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import InstallPWA from '@/components/InstallPWA';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -44,29 +46,29 @@ export default function LoginPage() {
             <Activity size={48} color="var(--primary)" />
           </div>
           <h1>myBPBuddy</h1>
-          <p>Seu assistente de saúde cardiovascular</p>
+          <p>{t.login.tagline}</p>
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
           {error && <div className={styles.error}>{error}</div>}
 
           <div className={styles.inputGroup}>
-            <label htmlFor="email">E-mail</label>
+            <label htmlFor="email">{t.login.email}</label>
             <input
               type="email"
               id="email"
-              placeholder="seu@email.com"
+              placeholder={t.login.emailPlaceholder}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
           <div className={styles.inputGroup}>
-            <label htmlFor="password">Senha</label>
+            <label htmlFor="password">{t.login.password}</label>
             <input
               type="password"
               id="password"
-              placeholder="••••••••"
+              placeholder={t.login.passwordPlaceholder}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -74,16 +76,16 @@ export default function LoginPage() {
           </div>
 
           <button type="submit" className={styles.loginButton} disabled={loading}>
-            {loading ? 'Entrando...' : 'Entrar'}
+            {loading ? t.login.loggingIn : t.login.loginButton}
           </button>
 
           <div className={styles.forgotPassword}>
-            <a href="#">Esqueceu a senha?</a>
+            <a href="#">{t.login.forgotPassword}</a>
           </div>
         </form>
 
         <div className={styles.footer}>
-          <p>Não tem uma conta? <Link href="/register">Criar agora</Link></p>
+          <p>{t.login.noAccount} <Link href="/register">{t.login.createNow}</Link></p>
         </div>
 
         <InstallPWA />

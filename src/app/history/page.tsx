@@ -2,6 +2,7 @@
 
 import styles from './history.module.css';
 import { useEffect, useState } from 'react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 interface Reading {
     id: number;
@@ -17,53 +18,55 @@ interface Group {
     items: Reading[];
 }
 
-function getBpStatus(systolic: number, diastolic: number): { label: string; color: string } {
-    if (systolic < 90 || diastolic < 60) return { label: 'Baixa', color: '#3b82f6' };
-    if (systolic > 180 || diastolic > 120) return { label: 'Crise', color: '#7f1d1d' };
-    if (systolic >= 140 || diastolic >= 90) return { label: 'Alta', color: '#ef4444' };
-    if (systolic >= 130 || diastolic >= 80) return { label: 'Elevada', color: '#f59e0b' };
-    return { label: 'Normal', color: 'var(--accent)' };
-}
-
-function periodLabel(period: string): string {
-    if (period === 'morning') return 'Manhã';
-    if (period === 'night') return 'Noite';
-    return 'Extra';
-}
-
-function groupByDate(readings: Reading[]): Group[] {
-    const map = new Map<string, Reading[]>();
-    for (const r of readings) {
-        const d = new Date(r.measured_at);
-        const key = d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-        if (!map.has(key)) map.set(key, []);
-        map.get(key)!.push(r);
-    }
-    return Array.from(map.entries()).map(([dateLabel, items]) => ({ dateLabel, items }));
-}
-
 export default function HistoryPage() {
+    const { t } = useLanguage();
     const [groups, setGroups] = useState<Group[]>([]);
     const [loading, setLoading] = useState(true);
+
+    function getBpStatus(systolic: number, diastolic: number): { label: string; color: string } {
+        if (systolic < 90 || diastolic < 60) return { label: t.bpStatus.low, color: '#3b82f6' };
+        if (systolic > 180 || diastolic > 120) return { label: t.bpStatus.crisis, color: '#7f1d1d' };
+        if (systolic >= 140 || diastolic >= 90) return { label: t.bpStatus.high, color: '#ef4444' };
+        if (systolic >= 130 || diastolic >= 80) return { label: t.bpStatus.elevated, color: '#f59e0b' };
+        return { label: t.bpStatus.normal, color: 'var(--accent)' };
+    }
+
+    function periodLabel(period: string): string {
+        if (period === 'morning') return t.period.morning;
+        if (period === 'night') return t.period.night;
+        return t.period.extra;
+    }
+
+    function groupByDate(readings: Reading[]): Group[] {
+        const map = new Map<string, Reading[]>();
+        for (const r of readings) {
+            const d = new Date(r.measured_at);
+            const key = d.toLocaleDateString(t.locale, { day: '2-digit', month: 'long', year: 'numeric' });
+            if (!map.has(key)) map.set(key, []);
+            map.get(key)!.push(r);
+        }
+        return Array.from(map.entries()).map(([dateLabel, items]) => ({ dateLabel, items }));
+    }
 
     useEffect(() => {
         fetch('/api/readings?limit=100')
             .then((r) => r.json())
             .then((d) => setGroups(groupByDate(d.readings ?? [])))
             .finally(() => setLoading(false));
-    }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [t.locale]);
 
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <h1>Histórico</h1>
-                <p>Acompanhe suas últimas medições</p>
+                <h1>{t.history.title}</h1>
+                <p>{t.history.subtitle}</p>
             </header>
 
             <main className={styles.main}>
-                {loading && <p style={{ color: 'var(--muted)' }}>Carregando...</p>}
+                {loading && <p style={{ color: 'var(--muted)' }}>{t.history.loading}</p>}
                 {!loading && groups.length === 0 && (
-                    <p style={{ color: 'var(--muted)', fontSize: '0.875rem' }}>Nenhum registro encontrado.</p>
+                    <p style={{ color: 'var(--muted)', fontSize: '0.875rem' }}>{t.history.noRecords}</p>
                 )}
                 {groups.map((group) => (
                     <section key={group.dateLabel} className={styles.group}>
@@ -71,7 +74,7 @@ export default function HistoryPage() {
                         <div className={styles.list}>
                             {group.items.map((r) => {
                                 const status = getBpStatus(r.systolic, r.diastolic);
-                                const time = new Date(r.measured_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                                const time = new Date(r.measured_at).toLocaleTimeString(t.locale, { hour: '2-digit', minute: '2-digit' });
                                 return (
                                     <div key={r.id} className={styles.item}>
                                         <div className={styles.timeInfo}>

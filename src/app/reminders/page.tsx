@@ -4,6 +4,7 @@ import styles from './reminders.module.css';
 import { useState, useEffect } from 'react';
 import { Sun, Moon, Droplets, Pill, Plus, Activity, Trash2, Bell, BellOff } from 'lucide-react';
 import { usePushNotifications } from '@/lib/usePushNotifications';
+import { useLanguage } from '@/lib/LanguageContext';
 
 interface Reminder {
     id: number;
@@ -23,15 +24,10 @@ function iconFor(type: string) {
     return <Activity size={22} color="var(--muted)" />;
 }
 
-function descriptionFor(r: Reminder): string {
-    if (r.interval_hours) return `A cada ${r.interval_hours} hora${r.interval_hours > 1 ? 's' : ''}`;
-    if (r.time) return `Todos os dias às ${r.time}`;
-    return 'Sem horário definido';
-}
-
 const defaultForm = { type: '' as '' | 'bp' | 'medication' | 'water', label: '', time: '', interval: '2' };
 
 export default function RemindersPage() {
+    const { t } = useLanguage();
     const { permission, subscribed, loading: pushLoading, subscribe, unsubscribe } = usePushNotifications();
     const [reminders, setReminders] = useState<Reminder[]>([]);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -46,6 +42,12 @@ export default function RemindersPage() {
         fetch('/api/reminders')
             .then((r) => r.json())
             .then((d) => setReminders(d.reminders ?? []));
+    }
+
+    function descriptionFor(r: Reminder): string {
+        if (r.interval_hours) return t.reminders.everyHour(r.interval_hours);
+        if (r.time) return t.reminders.everyday(r.time);
+        return t.reminders.noTime;
     }
 
     async function toggle(r: Reminder) {
@@ -111,9 +113,7 @@ export default function RemindersPage() {
         setSaving(false);
     }
 
-    // Fixed defaults can't be deleted; user-added reminders can
     const fixedTypes = new Set(['bp_morning', 'bp_night']);
-
     const bpReminders = reminders.filter((r) => r.type === 'bp_morning' || r.type === 'bp_night' || r.type === 'bp');
     const waterReminders = reminders.filter((r) => r.type === 'water');
     const medReminders = reminders.filter((r) => r.type === 'medication');
@@ -184,92 +184,89 @@ export default function RemindersPage() {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <h1>Lembretes</h1>
-                <p>Mantenha sua rotina em dia</p>
+                <h1>{t.reminders.title}</h1>
+                <p>{t.reminders.subtitle}</p>
             </header>
 
             <main className={styles.main}>
-                {/* Push notification banner */}
                 {permission === 'unsupported' ? null : permission === 'denied' ? (
                     <div className={styles.notifBanner} data-state="denied">
                         <BellOff size={20} />
                         <div>
-                            <strong>Notificações bloqueadas</strong>
-                            <p>Habilite nas configurações do navegador para receber lembretes.</p>
+                            <strong>{t.reminders.notifDeniedTitle}</strong>
+                            <p>{t.reminders.notifDeniedDesc}</p>
                         </div>
                     </div>
                 ) : subscribed ? (
                     <div className={styles.notifBanner} data-state="active">
                         <Bell size={20} />
                         <div className={styles.notifText}>
-                            <strong>Notificações ativas</strong>
-                            <p>Você receberá alertas nos horários configurados.</p>
+                            <strong>{t.reminders.notifActiveTitle}</strong>
+                            <p>{t.reminders.notifActiveDesc}</p>
                         </div>
                         <button className={styles.notifAction} onClick={unsubscribe} disabled={pushLoading}>
-                            {pushLoading ? '...' : 'Desativar'}
+                            {pushLoading ? '...' : t.reminders.notifDeactivate}
                         </button>
                     </div>
                 ) : (
                     <div className={styles.notifBanner} data-state="idle">
                         <Bell size={20} />
                         <div className={styles.notifText}>
-                            <strong>Ativar notificações</strong>
-                            <p>Receba alertas dos seus lembretes em tempo real.</p>
+                            <strong>{t.reminders.notifIdleTitle}</strong>
+                            <p>{t.reminders.notifIdleDesc}</p>
                         </div>
                         <button className={styles.notifAction} onClick={subscribe} disabled={pushLoading}>
-                            {pushLoading ? '...' : 'Ativar'}
+                            {pushLoading ? '...' : t.reminders.notifActivate}
                         </button>
                     </div>
                 )}
 
                 {reminders.length === 0 && !showAddForm && (
-                    <p style={{ color: 'var(--muted)', fontSize: '0.875rem' }}>Carregando...</p>
+                    <p style={{ color: 'var(--muted)', fontSize: '0.875rem' }}>{t.reminders.loading}</p>
                 )}
 
-                <ReminderSection title="Pressão Arterial" list={bpReminders} />
-                <ReminderSection title="Medicamentos" list={medReminders} />
-                <ReminderSection title="Beber Água" list={waterReminders} />
+                <ReminderSection title={t.reminders.sectionBP} list={bpReminders} />
+                <ReminderSection title={t.reminders.sectionMeds} list={medReminders} />
+                <ReminderSection title={t.reminders.sectionWater} list={waterReminders} />
 
                 {showAddForm ? (
                     <div className={styles.addForm}>
-                        <h3>Novo Lembrete</h3>
+                        <h3>{t.reminders.addTitle}</h3>
 
-                        {/* Type picker */}
                         <div className={styles.typePicker}>
                             <button
                                 className={`${styles.typeBtn} ${form.type === 'bp' ? styles.typeBtnActive : ''}`}
                                 onClick={() => setForm((f) => ({ ...f, type: 'bp' }))}
                             >
                                 <Activity size={20} />
-                                Pressão
+                                {t.reminders.typeBP}
                             </button>
                             <button
                                 className={`${styles.typeBtn} ${form.type === 'medication' ? styles.typeBtnActive : ''}`}
                                 onClick={() => setForm((f) => ({ ...f, type: 'medication' }))}
                             >
                                 <Pill size={20} />
-                                Medicamento
+                                {t.reminders.typeMed}
                             </button>
                             <button
                                 className={`${styles.typeBtn} ${form.type === 'water' ? styles.typeBtnActive : ''}`}
                                 onClick={() => setForm((f) => ({ ...f, type: 'water' }))}
                             >
                                 <Droplets size={20} />
-                                Água
+                                {t.reminders.typeWater}
                             </button>
                         </div>
 
-                        {/* Fields for BP */}
                         {form.type === 'bp' && (
                             <div className={styles.addFormFields}>
                                 <input
                                     type="text"
-                                    placeholder="Nome (ex: Após almoço)"
+                                    placeholder={t.reminders.bpNamePlaceholder}
                                     value={form.label}
                                     onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))}
                                     autoFocus
                                 />
-                                <label className={styles.fieldLabel}>Horário</label>
+                                <label className={styles.fieldLabel}>{t.reminders.timeLabel}</label>
                                 <input
                                     type="time"
                                     value={form.time}
@@ -278,17 +275,16 @@ export default function RemindersPage() {
                             </div>
                         )}
 
-                        {/* Fields for Medication */}
                         {form.type === 'medication' && (
                             <div className={styles.addFormFields}>
                                 <input
                                     type="text"
-                                    placeholder="Nome do medicamento"
+                                    placeholder={t.reminders.medNamePlaceholder}
                                     value={form.label}
                                     onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))}
                                     autoFocus
                                 />
-                                <label className={styles.fieldLabel}>Horário da dose</label>
+                                <label className={styles.fieldLabel}>{t.reminders.doseLabel}</label>
                                 <input
                                     type="time"
                                     value={form.time}
@@ -297,39 +293,35 @@ export default function RemindersPage() {
                             </div>
                         )}
 
-                        {/* Fields for Water */}
                         {form.type === 'water' && (
                             <div className={styles.addFormFields}>
-                                <label className={styles.fieldLabel}>Lembrar a cada</label>
+                                <label className={styles.fieldLabel}>{t.reminders.intervalLabel}</label>
                                 <select
                                     value={form.interval}
                                     onChange={(e) => setForm((f) => ({ ...f, interval: e.target.value }))}
                                     className={styles.selectField}
                                 >
-                                    <option value="1">1 hora</option>
-                                    <option value="2">2 horas</option>
-                                    <option value="3">3 horas</option>
-                                    <option value="4">4 horas</option>
-                                    <option value="6">6 horas</option>
-                                    <option value="8">8 horas</option>
+                                    {[1, 2, 3, 4, 6, 8].map((h) => (
+                                        <option key={h} value={String(h)}>{t.reminders.hours(h)}</option>
+                                    ))}
                                 </select>
                             </div>
                         )}
 
                         <div className={styles.addFormActions}>
-                            <button className={styles.cancelFormBtn} onClick={closeForm}>Cancelar</button>
+                            <button className={styles.cancelFormBtn} onClick={closeForm}>{t.reminders.cancel}</button>
                             <button
                                 className={styles.confirmAddBtn}
                                 onClick={addReminder}
                                 disabled={saving || !form.type || (form.type !== 'water' && !form.time)}
                             >
-                                {saving ? 'Salvando...' : 'Adicionar'}
+                                {saving ? t.reminders.adding : t.reminders.add}
                             </button>
                         </div>
                     </div>
                 ) : (
                     <button className={styles.addButton} onClick={() => setShowAddForm(true)}>
-                        <Plus size={20} /> Adicionar Lembrete
+                        <Plus size={20} /> {t.reminders.addButton}
                     </button>
                 )}
             </main>
