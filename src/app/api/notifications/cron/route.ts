@@ -6,9 +6,17 @@ import type webpush from 'web-push';
 // This endpoint is called by a cron job every minute.
 // It checks all active reminders and sends push notifications when the time matches.
 
-function currentHHMM(): string {
-  const now = new Date();
-  return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+function currentHHMM(): { hhmm: string; hour: number } {
+  const tz = process.env.APP_TIMEZONE ?? 'America/Sao_Paulo';
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(new Date());
+  const hour = parts.find((p) => p.type === 'hour')?.value ?? '00';
+  const minute = parts.find((p) => p.type === 'minute')?.value ?? '00';
+  return { hhmm: `${hour}:${minute}`, hour: parseInt(hour, 10) };
 }
 
 function notificationFor(type: string, label: string): { title: string; body: string } {
@@ -31,8 +39,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const now = currentHHMM();
-  const currentHour = new Date().getHours();
+  const { hhmm: now, hour: currentHour } = currentHHMM();
 
   // Find all active reminders that match the current time
   // For time-based: match HH:MM exactly
