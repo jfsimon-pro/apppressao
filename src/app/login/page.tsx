@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Activity } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import InstallPWA from '@/components/InstallPWA';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -84,6 +85,8 @@ export default function LoginPage() {
         <div className={styles.footer}>
           <p>Não tem uma conta? <Link href="/register">Criar agora</Link></p>
         </div>
+
+        <InstallPWA />
       </div>
     </div>
   );
