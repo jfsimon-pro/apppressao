@@ -1,0 +1,272 @@
+.container {
+    min-height: 100vh;
+    background-color: var(--background);
+    padding: 1.5rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    animation: fadeIn var(--transition-normal) forwards;
+}
+
+.welcome p {
+    color: var(--muted);
+    font-size: 0.875rem;
+}
+
+.welcome h1 {
+    font-size: 1.5rem;
+    color: var(--foreground);
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    box-shadow: 0 4px 6px -1px var(--primary-light);
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    animation: fadeIn var(--transition-normal) forwards;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.sectionHeader h2 {
+    font-size: 1.25rem;
+    color: var(--foreground);
+}
+
+.date,
+.seeAll {
+    font-size: 0.875rem;
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+@media (min-width: 600px) {
+    .grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+.card,
+.cardCustom {
+    background: var(--surface);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.cardCustom {
+    background: var(--primary-light);
+    border-color: var(--primary-light);
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cardIcon {
+    font-size: 1.5rem;
+}
+
+.card h3,
+.cardCustom h3 {
+    font-size: 1rem;
+    color: var(--foreground);
+}
+
+.inputs {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.timeInput {
+    min-width: 90px;
+}
+
+.obsField {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.obsField label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.obsField textarea {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--background);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--foreground);
+    resize: none;
+}
+
+.inputField {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.inputField label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.inputField input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--background);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    text-align: center;
+}
+
+.saveButton {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--accent);
+    color: white;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.saveButton:hover {
+    background-color: var(--accent-hover);
+}
+
+.historyList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.historyItem {
+    background: var(--surface);
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.historyLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.historyTime {
+    display: flex;
+    flex-direction: column;
+}
+
+.historyTime strong {
+    font-size: 0.9375rem;
+}
+
+.historyTime span {
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+.historyObs {
+    font-size: 0.8125rem;
+    color: var(--muted);
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.historyValue {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
+.historyValue span:first-child {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.statusBaixa {
+    font-size: 0.75rem;
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+.statusNormal {
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.statusElevada {
+    font-size: 0.75rem;
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+.statusAlta {
+    font-size: 0.75rem;
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.statusCrise {
+    font-size: 0.75rem;
+    color: #7f1d1d;
+    font-weight: 600;
+}
+
+.spacer {
+    height: 80px;
+}

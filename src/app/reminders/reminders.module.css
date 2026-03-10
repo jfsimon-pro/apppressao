@@ -1,0 +1,401 @@
+.container {
+    min-height: 100vh;
+    background-color: var(--background);
+    padding: 1.5rem;
+}
+
+.header {
+    margin-bottom: 2rem;
+    animation: fadeIn var(--transition-normal) forwards;
+}
+
+.header h1 {
+    font-size: 1.75rem;
+    color: var(--foreground);
+}
+
+.header p {
+    color: var(--muted);
+    font-size: 1rem;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    animation: fadeIn var(--transition-normal) forwards;
+}
+
+/* Push notification banner */
+.notifBanner {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.notifBanner[data-state="active"] {
+    background: #ecfdf5;
+    border-color: #6ee7b7;
+}
+
+.notifBanner[data-state="denied"] {
+    background: #fff7ed;
+    border-color: #fdba74;
+}
+
+.notifBanner[data-state="idle"] {
+    background: var(--primary-light);
+    border-color: #93c5fd;
+}
+
+.notifBanner svg {
+    flex-shrink: 0;
+    color: var(--primary);
+}
+
+.notifBanner[data-state="active"] svg { color: #059669; }
+.notifBanner[data-state="denied"] svg { color: #ea580c; }
+
+.notifText {
+    flex: 1;
+    min-width: 0;
+}
+
+.notifBanner strong {
+    display: block;
+    font-size: 0.9375rem;
+    color: var(--foreground);
+}
+
+.notifBanner p {
+    font-size: 0.8125rem;
+    color: var(--muted);
+    margin-top: 0.125rem;
+}
+
+.notifAction {
+    flex-shrink: 0;
+    padding: 0.4rem 0.875rem;
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    color: white;
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.notifAction:disabled {
+    opacity: 0.6;
+}
+
+.category h2 {
+    font-size: 1.125rem;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+}
+
+.reminderItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem;
+    transition: var(--transition-fast);
+}
+
+.info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.icon {
+    font-size: 1.5rem;
+    width: 44px;
+    height: 44px;
+    background: var(--background);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.infoText {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.info strong {
+    display: block;
+    font-size: 1rem;
+    color: var(--foreground);
+}
+
+.info p {
+    font-size: 0.875rem;
+    color: var(--muted);
+}
+
+.editableTime {
+    cursor: pointer;
+}
+
+.editHint {
+    opacity: 0.5;
+    font-size: 0.75rem;
+}
+
+.inlineEdit {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 0.125rem;
+}
+
+.inlineEdit input[type="time"] {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--background);
+    font-size: 0.875rem;
+    color: var(--foreground);
+}
+
+.saveTimeBtn {
+    padding: 0.2rem 0.6rem;
+    background: var(--primary);
+    color: white;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.cancelBtn {
+    padding: 0.2rem 0.5rem;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.75rem;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.deleteBtn {
+    color: #ef4444;
+    background: transparent;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.deleteBtn:hover {
+    opacity: 1;
+}
+
+.divider {
+    height: 1px;
+    background-color: var(--border);
+    margin: 0 1.25rem;
+}
+
+/* Switch UI */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border);
+    transition: .4s;
+    border-radius: var(--radius-full);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+input:checked+.slider {
+    background-color: var(--primary);
+}
+
+input:checked+.slider:before {
+    transform: translateX(22px);
+}
+
+.addButton {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--surface);
+    color: var(--primary);
+    border: 2px dashed var(--primary-light);
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition-fast);
+}
+
+.addButton:hover {
+    background-color: var(--primary-light);
+}
+
+.addButton span {
+    font-size: 1.5rem;
+}
+
+.addForm {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: var(--card-shadow);
+}
+
+.addForm h3 {
+    font-size: 1rem;
+    color: var(--foreground);
+    font-weight: 600;
+}
+
+.addFormFields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.typePicker {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+}
+
+.typeBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.75rem 0.5rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--background);
+    color: var(--muted);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.typeBtnActive {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.fieldLabel {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: -0.25rem;
+}
+
+.addFormFields input[type="text"],
+.addFormFields input[type="time"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--background);
+    font-size: 1rem;
+    color: var(--foreground);
+}
+
+.selectField {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--background);
+    font-size: 1rem;
+    color: var(--foreground);
+}
+
+.addFormActions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.cancelFormBtn {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.confirmAddBtn {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+}
+
+.confirmAddBtn:disabled {
+    opacity: 0.5;
+}
+
+.spacer {
+    height: 90px;
+}
